@@ -61,7 +61,7 @@ COPY main.py XianyuAgent.py XianyuApis.py context_manager.py ./
 COPY utils/ utils/
 
 # 声明 logs 和 data 为可挂载卷，方便宿主机持久化数据
-VOLUME ["/app/data", "/app/logs"]
+VOLUME ["/app/data", "/app/logs", "/app/prompts"]
 
 # 容器启动时运行的命令
 CMD ["python", "main.py"]
