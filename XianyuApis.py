@@ -85,4 +85,4 @@ class XianyuApis:
                 logger.warning(".env文件中未找到COOKIES_STR配置项")
         except Exception as e:
             # Fixed: original code had a typo 'exce' which would cause a SyntaxError
-            logger.error(f"更新.env文件时发生错误: {e}")
+            logger.error(f"更新.env文件时出错: {e}")
