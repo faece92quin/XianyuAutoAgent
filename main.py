@@ -58,7 +58,9 @@ async def run_agent(apis: XianyuApis, bot: XianyuReplyBot) -> None:
 
     logger.info("Login verified. Starting message polling loop...")
 
-    poll_interval = int(os.getenv("POLL_INTERVAL_SECONDS", "5"))
+    # Increased default poll interval to 10s to be gentler on the API
+    # and reduce the chance of rate limiting on my account.
+    poll_interval = int(os.getenv("POLL_INTERVAL_SECONDS", "10"))
 
     while True:
         try:
@@ -93,58 +95,3 @@ async def process_conversation(apis: XianyuApis, bot: XianyuReplyBot, conv: dict
     logger.info("Processing conversation %s | item: %s | msg: %s", conv_id, item_id, last_message[:50])
 
     # Generate reply using the AI agent
-    reply = await bot.generate_reply(
-        conversation_id=conv_id,
-        item_id=item_id,
-        user_message=last_message,
-        context=conv.get("context", {}),
-    )
-
-    if reply:
-        success = apis.send_message(conv_id=conv_id, content=reply)
-        if success:
-            logger.info("Replied to %s: %s", conv_id, reply[:80])
-        else:
-            logger.warning("Failed to send reply to conversation %s", conv_id)
-    else:
-        logger.warning("No reply generated for conversation %s", conv_id)
-
-
-def handle_shutdown(signum, frame):
-    """Handle OS shutdown signals gracefully."""
-    logger.info("Received signal %d, exiting...", signum)
-    sys.exit(0)
-
-
-def main():
-    """Application entry point."""
-    # Register signal handlers
-    signal.signal(signal.SIGINT, handle_shutdown)
-    signal.signal(signal.SIGTERM, handle_shutdown)
-
-    logger.info("=" * 50)
-    logger.info("  XianyuAutoAgent")
-    logger.info("=" * 50)
-
-    if not validate_env():
-        sys.exit(1)
-
-    # Initialize API client and AI bot
-    cookies_str = os.getenv("COOKIES_STR", "")
-    apis = XianyuApis(cookies_str=cookies_str)
-    bot = XianyuReplyBot()
-
-    # Run the async agent loop
-    try:
-        asyncio.run(run_agent(apis, bot))
-    except SystemExit:
-        pass
-    except Exception as e:
-        logger.critical("Fatal error: %s", e, exc_info=True)
-        sys.exit(1)
-
-    logger.info("XianyuAutoAgent stopped.")
-
-
-if __name__ == "__main__":
-    main()
