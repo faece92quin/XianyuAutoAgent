@@ -32,7 +32,7 @@ ENV TZ=Asia/Shanghai \
     PATH="/opt/venv/bin:$PATH" \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    LOG_LEVEL=INFO
+    LOG_LEVEL=DEBUG
 
 # 只安装运行时必要的包
 RUN apk add --no-cache \
